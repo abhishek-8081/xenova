@@ -39,10 +39,11 @@ const RegisterPage = () => {
             <div className="max-w-md w-full mx-auto">
                 <div className="text-center mb-2">
                     <h1 className="text-4xl md:text-5xl font-medium text-black leading-tight mb-4 font-dm-sans tracking-tighter">
-                        Join <span className="italic font-instrument-serif tracking-normal">Xenova</span>
+                        Create your{" "}
+                        <span className="italic font-instrument-serif tracking-normal">account</span>
                     </h1>
                     <p className="text-sm md:text-md text-black mb-4 leading-relaxed font-ibm-plex-mono">
-                        Start your trading journey with limitless opportunities
+                        Get set up in seconds and start trading on Xenova
                     </p>
                 </div>
 

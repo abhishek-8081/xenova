@@ -34,10 +34,11 @@ const LoginPage = () => {
             <div className="max-w-md w-full mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-medium text-black leading-tight mb-4 font-dm-sans tracking-tighter">
-                        Welcome <span className="italic font-instrument-serif tracking-normal">Back</span>
+                        Good to have{" "}
+                        <span className="italic font-instrument-serif tracking-normal">you back</span>
                     </h1>
                     <p className="text-sm md:text-md text-black mb-4 leading-relaxed font-ibm-plex-mono">
-                        Continue your trading journey with Xenova
+                        Sign in to pick up right where you left off
                     </p>
                 </div>
 

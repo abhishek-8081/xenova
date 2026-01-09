@@ -1,108 +1,117 @@
-# Xenova — Real-Time Options Trading Platform
+# Xenova
 
-A full-stack options trading platform inspired by Exness. Trade BTC/USDC perpetuals with live prices, leverage, take-profit/stop-loss controls, and real-time PnL tracking — all in your browser.
+Xenova is a real-time perpetuals trading platform where you can open leveraged BTC/USDC positions, set take-profit and stop-loss targets, and track your PnL as prices move — live, in the browser.
 
----
-
-## What It Looks Like
-
-### Landing Page
-<!-- Screenshot: home page with header and hero section -->
-![Landing Page](./docs/screenshots/landing.png)
-
-### Trading Dashboard
-<!-- Screenshot: marketplace page with chart, order book, and trade panel -->
-![Trading Dashboard](./docs/screenshots/dashboard.png)
-
-### Order History
-<!-- Screenshot: orders section showing open/closed positions with PnL -->
-![Order History](./docs/screenshots/orders.png)
-
-### Login & Register
-<!-- Screenshot: auth pages -->
-![Auth Pages](./docs/screenshots/auth.png)
+Built as a full-stack TypeScript monorepo using Turborepo and pnpm workspaces.
 
 ---
 
-## Tech Stack
+## Screenshots
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 15, React 19, Tailwind CSS v4, TanStack Query |
-| API Server | Node.js, Express, TypeScript |
-| Trading Engine | Node.js, TypeScript, Redis Streams |
-| Price Feed | WebSocket → Backpack Exchange |
-| Database | PostgreSQL, Prisma ORM |
-| Messaging | Redis Streams |
-| Monorepo | Turborepo, pnpm workspaces |
-| Containers | Docker, Docker Compose |
+### Home
+<!-- Add screenshot of the landing page here -->
+![Home](./docs/screenshots/home.png)
+
+### Trading View
+<!-- Add screenshot of the trading dashboard here -->
+![Trading View](./docs/screenshots/trading.png)
+
+### Positions & History
+<!-- Add screenshot of the orders/positions panel here -->
+![Positions](./docs/screenshots/positions.png)
+
+### Auth
+<!-- Add screenshot of login/register pages here -->
+![Auth](./docs/screenshots/auth.png)
 
 ---
 
-## Project Structure
+## Stack
+
+**Frontend**
+- Next.js 15 (App Router) + React 19
+- Tailwind CSS v4
+- TanStack Query v5
+- lightweight-charts for candlestick chart
+- Axios with cookie-based auth
+
+**Backend**
+- Node.js + Express (API Service)
+- Node.js + Redis Streams (Engine + Price Poller)
+- PostgreSQL with Prisma ORM
+- Redis for inter-service messaging
+
+**Infrastructure**
+- Turborepo for monorepo orchestration
+- Docker + Docker Compose
+- pnpm workspaces
+
+---
+
+## How the system works
+
+Three backend services run independently and talk through Redis Streams:
+
+**API Service** (`apps/api-service` · port 3001)
+Handles all client-facing HTTP traffic — registration, login (JWT stored in HTTP-only cookies), opening and closing positions, fetching balance, and serving candle data. When a trade action comes in, it writes an event to the `engine-stream` Redis stream and waits for the engine to respond on `callback-queue`.
+
+**Engine Service** (`apps/engine-service` · port 3002)
+The brain of the platform. Consumes events from `engine-stream`, processes orders against current market price, applies leverage, calculates unrealized PnL, checks take-profit and stop-loss conditions in real time, and writes confirmed results back to PostgreSQL and the callback queue.
+
+**Price Poller** (`apps/price-poller-service` · port 3003)
+Maintains a persistent WebSocket connection to Backpack Exchange and pushes live BTC/USDC price ticks into `engine-stream` so the engine always has an up-to-date price to work with.
+
+---
+
+## Monorepo layout
 
 ```
-Xenova-v2/
+.
 ├── apps/
-│   ├── web/                  # Next.js frontend (port 3200)
-│   ├── api-service/          # REST API server (port 3001)
-│   ├── engine-service/       # Trading engine (internal, port 3002)
-│   └── price-poller-service/ # Price feed via WebSocket (internal, port 3003)
-├── packages/
-│   ├── prisma/               # Database schema and migrations
-│   ├── redis/                # Shared Redis client
-│   ├── types/                # Shared TypeScript types
-│   ├── ui/                   # Shared UI component library
-│   ├── eslint-config/        # Shared ESLint config
-│   └── typescript-config/    # Shared tsconfig base
-└── docker-compose.yml
+│   ├── api-service/           # Express REST API
+│   ├── engine-service/        # Trading engine
+│   ├── price-poller-service/  # Live price feed
+│   └── web/                   # Next.js frontend
+└── packages/
+    ├── prisma/                # Shared DB client + schema
+    ├── redis/                 # Shared Redis client
+    ├── types/                 # Shared TypeScript types
+    ├── ui/                    # Shared component library
+    ├── eslint-config/         # ESLint presets
+    └── typescript-config/     # tsconfig presets
 ```
 
 ---
 
-## How It Works
+## Local setup
 
-The platform is split into three backend microservices that talk to each other through **Redis Streams**:
+### What you need
 
-1. **API Service** — handles all HTTP requests from the frontend: user auth (JWT + cookies), opening/closing trades, fetching balance and candle data. When a user places or closes an order, it writes to the `engine-stream` Redis stream and waits for a response on `callback-queue`.
+- Node.js 18 or later
+- pnpm (`npm i -g pnpm`)
+- Docker Desktop (for Postgres + Redis)
 
-2. **Engine Service** — the core of the platform. It listens on `engine-stream` for price updates and order events, processes trades, applies leverage, checks take-profit and stop-loss conditions, updates user balances in real time, and persists everything to PostgreSQL.
-
-3. **Price Poller Service** — maintains a persistent WebSocket connection to Backpack Exchange and streams live BTC/USDC prices into `engine-stream` every tick.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm (`npm install -g pnpm`)
-- Docker Desktop
-
-### 1. Clone and install
+### Step 1 — Install dependencies
 
 ```bash
-git clone <your-repo-url>
-cd Xenova-v2
 pnpm install
 ```
 
-### 2. Set up environment variables
+### Step 2 — Environment variables
 
-Each service needs its own `.env` file. Create these files:
+Create `.env` files for each service before starting anything.
 
 **`apps/api-service/.env`**
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/trading_db"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/xenova_db"
 REDIS_URL="redis://localhost:6379"
-JWT_SECRET="your-secret-key-here"
+JWT_SECRET="replace-with-a-strong-secret"
 PORT=3001
 ```
 
 **`apps/engine-service/.env`**
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/trading_db"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/xenova_db"
 REDIS_URL="redis://localhost:6379"
 PORT=3002
 ```
@@ -118,19 +127,19 @@ PORT=3003
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### 3. Start infrastructure (PostgreSQL + Redis)
+### Step 3 — Start Postgres and Redis
 
 ```bash
 docker compose up -d redis
 ```
 
-Or start everything via Docker:
+Or spin up the full stack with Docker:
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Run database migrations
+### Step 4 — Migrate the database
 
 ```bash
 cd packages/prisma
@@ -138,87 +147,108 @@ npx prisma migrate dev
 npx prisma generate
 ```
 
-### 5. Start development servers
+### Step 5 — Run in development mode
+
+Start everything at once:
 
 ```bash
-# Start all services at once
-pnpm run dev
+pnpm dev
 ```
 
-Or start individually:
+Or start services individually:
 
 ```bash
-pnpm run dev:api          # API Service on :3001
-pnpm run dev:engine       # Engine Service on :3002
-pnpm run dev:price-poller # Price Poller on :3003
+pnpm dev:api           # → http://localhost:3001
+pnpm dev:engine        # → http://localhost:3002
+pnpm dev:price-poller  # → http://localhost:3003
 ```
 
-Then open `http://localhost:3200` in your browser.
+Frontend runs on `http://localhost:3200`
+
+> All three backend services need to be running for trades to go through end-to-end.
 
 ---
 
-## API Endpoints
+## API reference
 
-### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Create a new account |
-| POST | `/auth/login` | Log in, sets HTTP-only cookie |
-| POST | `/auth/logout` | Clear session |
-| GET | `/auth/me` | Get current user info |
+### Auth · `/auth`
 
-### Trading
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/trade/create` | Open a new position |
-| POST | `/trade/close/:orderId` | Close an open position |
-| GET | `/trade/orders` | List all your orders |
-| GET | `/trade/orders/:orderId` | Get a single order |
+| Method | Path | What it does |
+|--------|------|--------------|
+| `POST` | `/auth/register` | Create a new user account |
+| `POST` | `/auth/login` | Authenticate and set session cookie |
+| `POST` | `/auth/logout` | Clear the session |
+| `GET` | `/auth/me` | Return the currently authenticated user |
 
-### Balance & Prices
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/balance` | Get your current balance |
-| GET | `/candles` | Get OHLCV candle data |
+### Trading · `/trade`
+
+| Method | Path | What it does |
+|--------|------|--------------|
+| `POST` | `/trade/create` | Open a new leveraged position |
+| `POST` | `/trade/close/:orderId` | Close an open position by ID |
+| `GET` | `/trade/orders` | List all orders for the current user |
+| `GET` | `/trade/orders/:orderId` | Get a single order by ID |
+
+### Other
+
+| Method | Path | What it does |
+|--------|------|--------------|
+| `GET` | `/balance` | Get asset balances for the current user |
+| `GET` | `/candles` | Fetch OHLCV candle data for charting |
+
+### Inter-service messaging
+
+| Stream | Direction | Purpose |
+|--------|-----------|---------|
+| `engine-stream` | API → Engine, Price Poller → Engine | Trade requests and price ticks |
+| `callback-queue` | Engine → API | Order confirmations and status updates |
 
 ---
 
-## Database Schema
+## Database schema
 
 ```
-Users        → id, email, password, name
-Assets       → symbol, balance, decimals, userId
-Orders       → id, userId, side, qty, openingPrice, closingPrice,
-               status, leverage, takeProfit, stopLoss, pnl, closeReason
+User
+  id, email, password (hashed), name
+
+Asset
+  symbol, balance, decimals, userId
+
+Order
+  id, userId, side, qty
+  openingPrice, closingPrice
+  status, leverage
+  takeProfit, stopLoss
+  pnl, closeReason
 ```
 
 ---
 
-## Available Scripts
+## Scripts
 
 ```bash
-pnpm run dev          # Start all apps in dev mode
-pnpm run build        # Build all packages and apps
-pnpm run check-types  # TypeScript type check across the whole monorepo
-pnpm run lint         # ESLint across all packages
-pnpm run format       # Prettier format all TS/TSX files
+pnpm dev          # Start all apps in watch mode
+pnpm build        # Production build across the monorepo
+pnpm check-types  # TypeScript check for all packages
+pnpm lint         # ESLint across the monorepo
+pnpm format       # Prettier format all TS/TSX/MD files
 ```
 
 ---
 
-## Production Deployment
+## Production
+
+Build and start individual services:
 
 ```bash
-# Build everything
-pnpm run build
+pnpm build
 
-# Start each service
-pnpm run start:api
-pnpm run start:engine
-pnpm run start:price-poller
+pnpm start:api
+pnpm start:engine
+pnpm start:price-poller
 ```
 
-Or use Docker Compose for a fully containerized deployment:
+Or build and run the whole thing with Docker Compose:
 
 ```bash
 docker compose up --build
@@ -226,21 +256,19 @@ docker compose up --build
 
 ---
 
-## Architecture Overview
+## Architecture
 
-<!-- Screenshot or diagram: service communication flow -->
-![Architecture Diagram](./docs/screenshots/architecture.png)
+<!-- Add architecture diagram here -->
+![Architecture](./docs/screenshots/architecture.png)
 
 ```
-Browser → Next.js Frontend
-            ↓ HTTP
-        API Service (3001)
-            ↓ Redis Stream (engine-stream)
-        Engine Service (3002)
-            ↑ Redis Stream (engine-stream)
-        Price Poller (3003) ← WebSocket ← Backpack Exchange
-            ↓ PostgreSQL
-        Database
+Browser
+  └─ HTTP ──► API Service (3001)
+                └─ Redis Stream (engine-stream) ──► Engine Service (3002)
+                                                         └─ PostgreSQL
+Backpack Exchange
+  └─ WebSocket ──► Price Poller (3003)
+                     └─ Redis Stream (engine-stream) ──► Engine Service
 ```
 
 ---

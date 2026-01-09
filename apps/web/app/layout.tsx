@@ -23,24 +23,24 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Xenova - Turn Market Volatility into 100x Returns",
-  description: "Buy with upto 100x leverage, because 10x ain't enough",
+  title: "Xenova — Trade Perpetuals with Precision and Leverage",
+  description: "Real-time BTC/USDC perpetuals trading with up to 100x leverage, live PnL, and instant order execution.",
   openGraph: {
-    title: "Xenova - Turn Market Volatility into 100x Returns",
-    description: "Buy with upto 100x leverage, because 10x ain't enough",
+    title: "Xenova — Trade Perpetuals with Precision and Leverage",
+    description: "Real-time BTC/USDC perpetuals trading with up to 100x leverage, live PnL, and instant order execution.",
     images: [
       {
         url: "/images/OG.png",
         width: 1200,
         height: 630,
-        alt: "Xenova - Turn Market Volatility into 100x Returns",
+        alt: "Xenova — Precision Trading Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Xenova - Turn Market Volatility into 100x Returns",
-    description: "Buy with upto 100x leverage, because 10x ain't enough",
+    title: "Xenova — Trade Perpetuals with Precision and Leverage",
+    description: "Real-time BTC/USDC perpetuals trading with up to 100x leverage, live PnL, and instant order execution.",
     images: ["/images/OG.png"],
   },
 };
