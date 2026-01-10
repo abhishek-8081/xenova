@@ -15,17 +15,14 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!name || !email || !password) {
             toast.error('Please fill in all fields');
             return;
         }
-
         if (password.length < 6) {
-            toast.error('Password must be at least 6 characters long');
+            toast.error('Password must be at least 6 characters');
             return;
         }
-
         try {
             await registerMutation.mutateAsync({ name, email, password });
             router.push('/');
@@ -35,100 +32,98 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center px-4">
-            <div className="max-w-md w-full mx-auto">
-                <div className="text-center mb-2">
-                    <h1 className="text-4xl md:text-5xl font-medium text-black leading-tight mb-4 font-dm-sans tracking-tighter">
-                        Create your{" "}
-                        <span className="italic font-instrument-serif tracking-normal">account</span>
-                    </h1>
-                    <p className="text-sm md:text-md text-black mb-4 leading-relaxed font-ibm-plex-mono">
-                        Get set up in seconds and start trading on Xenova
-                    </p>
-                </div>
+        <div className="min-h-screen bg-[#f0f0f0] p-4 md:p-6 flex items-center justify-center font-dm-sans">
+            <div className="w-full max-w-md">
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-black mb-2 font-dm-sans">
-                            Full Name
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-gray-600 transition-colors font-dm-sans bg-white"
-                            placeholder="Enter your full name"
-                            required
-                        />
+                {/* Logo */}
+                <Link href="/" className="block text-center text-2xl font-extrabold text-black font-dm-sans mb-8 tracking-tight">
+                    xenova.
+                </Link>
+
+                {/* Card */}
+                <div className="bg-[#e8e8e8] rounded-3xl px-8 py-10">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-extrabold text-black font-dm-sans tracking-tight mb-2">
+                            Create account
+                        </h1>
+                        <p className="text-sm text-gray-500 font-dm-sans">
+                            Start trading BTC/USDC perpetuals on Xenova
+                        </p>
                     </div>
 
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-black mb-2 font-dm-sans">
-                            Email Address
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-gray-600 transition-colors font-dm-sans bg-white"
-                            placeholder="Enter your email"
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <label htmlFor="name" className="block text-xs font-semibold text-black font-dm-sans uppercase tracking-wider mb-2">
+                                Full Name
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full px-4 py-3 bg-white border-2 border-transparent rounded-xl focus:outline-none focus:border-black transition-colors font-dm-sans text-sm text-black placeholder:text-gray-400"
+                                placeholder="Abhishek Kumar"
+                                required
+                            />
+                        </div>
 
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-black mb-2 font-dm-sans">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none focus:border-gray-600 transition-colors font-dm-sans bg-white"
-                            placeholder="Enter your password (min. 6 characters)"
-                            required
-                            minLength={6}
-                        />
-                    </div>
+                        <div>
+                            <label htmlFor="email" className="block text-xs font-semibold text-black font-dm-sans uppercase tracking-wider mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3 bg-white border-2 border-transparent rounded-xl focus:outline-none focus:border-black transition-colors font-dm-sans text-sm text-black placeholder:text-gray-400"
+                                placeholder="you@example.com"
+                                required
+                            />
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={registerMutation.isPending}
-                        className="w-full bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors font-dm-sans font-medium text-lg border-2 border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {registerMutation.isPending ? 'Creating Account...' : 'Create Account'}
-                    </button>
-                </form>
+                        <div>
+                            <label htmlFor="password" className="block text-xs font-semibold text-black font-dm-sans uppercase tracking-wider mb-2">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3 bg-white border-2 border-transparent rounded-xl focus:outline-none focus:border-black transition-colors font-dm-sans text-sm text-black placeholder:text-gray-400"
+                                placeholder="Min. 6 characters"
+                                required
+                                minLength={6}
+                            />
+                        </div>
 
-                <div className="mt-8 text-center">
-                    <p className="text-sm text-black font-dm-sans">
-                        Already have an account?{' '}
-                        <Link
-                            href="/login"
-                            className="font-medium hover:text-gray-700 transition-colors underline"
+                        <button
+                            type="submit"
+                            disabled={registerMutation.isPending}
+                            className="w-full bg-black text-white font-dm-sans font-bold text-sm py-3.5 rounded-xl border-2 border-black hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                         >
+                            {registerMutation.isPending ? 'Creating account...' : 'Create Account'}
+                        </button>
+                    </form>
+
+                    <p className="text-sm text-gray-500 font-dm-sans text-center mt-6">
+                        Already have an account?{' '}
+                        <Link href="/login" className="text-black font-semibold hover:underline">
                             Sign in
                         </Link>
                     </p>
-                </div>
 
-                <div className="mt-6 text-center">
-                    <Link
-                        href="/"
-                        className="text-sm text-black hover:text-gray-700 transition-colors font-dm-sans underline"
-                    >
-                        ← Back to Home
-                    </Link>
-                </div>
-
-                <div className="mt-6 text-center">
-                    <p className="text-xs text-gray-600 font-dm-sans leading-relaxed">
-                        By creating an account, you agree to our Terms of Service and Privacy Policy
+                    <p className="text-xs text-gray-400 font-dm-sans text-center mt-4">
+                        By creating an account you agree to our Terms &amp; Privacy Policy
                     </p>
                 </div>
+
+                <p className="text-center mt-5">
+                    <Link href="/" className="text-xs text-gray-400 font-dm-sans hover:text-black transition-colors">
+                        ← Back to Home
+                    </Link>
+                </p>
             </div>
         </div>
     );

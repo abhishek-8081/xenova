@@ -7,7 +7,7 @@ export class RedisSubscriber {
   private callbacks: Record<string, (data: Record<string, string>) => void>;
 
   constructor() {
-    const host = process.env.REDIS_HOST || "redis";
+    const host = process.env.REDIS_HOST || "localhost";
     const port = Number(process.env.REDIS_PORT || 6379);
     this.client = new Redis({ host, port });
     this.callbacks = {};

@@ -2,160 +2,87 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../hooks/useAuth";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const { isAuthenticated, logoutMutation } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
   return (
-    <header className="fixed top-0 w-full px-4 py-6 md:px-8 lg:px-12 bg-white z-50 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="w-2 h-2 bg-black rounded-full"></div>
-          <span className="text-xl font-semibold font-ibm-plex-mono">
-            Xenova
-          </span>
-        </Link>
+    <header className="w-full z-50 bg-transparent px-6 md:px-10 py-5 flex items-center justify-between">
+      <Link href="/" className="text-xl font-bold tracking-tight text-black font-dm-sans">
+        xenova
+      </Link>
 
-        <nav className="hidden md:flex items-center space-x-8 lg:space-x-12">
+      <nav className="hidden md:flex items-center gap-10">
+        {[
+          { label: "Home", href: "/" },
+          { label: "Trade", href: "/marketplace" },
+          { label: "Docs", href: "/docs" },
+        ].map(({ label, href }) => (
           <Link
-            href="/"
-            className={`text-black hover:text-gray-700 transition-colors font-instrument-sans ${pathname === "/" ? "font-bold" : "text-black"}`}
+            key={label}
+            href={href}
+            className={`text-sm font-dm-sans transition-colors ${
+              pathname === href ? "text-black font-semibold" : "text-gray-500 hover:text-black"
+            }`}
           >
-            Home
+            {label}
           </Link>
-          <Link
-            href="/docs"
-            className={`text-black hover:text-gray-700 transition-colors font-instrument-sans ${pathname === "/docs" ? "font-bold" : "text-black"}`}
-          >
-            Docs
-          </Link>
-          <Link
-            href="/marketplace"
-            className={`text-black hover:text-gray-700 transition-colors font-instrument-sans ${pathname === "/marketplace" ? "font-bold" : "text-black"}`}
-          >
-            Marketplace
-          </Link>
-        </nav>
+        ))}
+      </nav>
 
-        <div className="flex items-center space-x-4">
-          {isAuthenticated ? (
+      <div className="hidden md:flex items-center gap-3">
+        {isAuthenticated ? (
+          <>
+            <Link href="/marketplace" className="text-sm font-dm-sans text-gray-600 hover:text-black transition-colors">
+              Dashboard
+            </Link>
             <button
               onClick={() => logoutMutation.mutate()}
-              className="border border-black text-black px-6 py-2 rounded-4xl transition-colors font-instrument-sans font-medium cursor-pointer"
+              className="text-sm font-dm-sans border-2 border-black bg-white text-black px-6 py-2 rounded-xl font-semibold hover:bg-black hover:text-white transition-colors"
             >
               Logout
             </button>
-          ) : (
+          </>
+        ) : (
+          <>
             <Link
               href="/login"
-              className="bg-black text-white px-6 py-2 rounded-4xl hover:bg-gray-800 transition-colors font-instrument-sans font-medium cursor-pointer"
+              className="text-sm font-dm-sans border-2 border-black bg-white text-black px-6 py-2 rounded-xl font-semibold hover:bg-black hover:text-white transition-colors"
             >
               Login
             </Link>
-          )}
-        </div>
-
-        <button 
-          className="md:hidden p-2 z-50 relative"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {isMobileMenuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            )}
-          </svg>
-        </button>
+            <Link
+              href="/register"
+              className="text-sm font-dm-sans bg-black text-white px-6 py-2 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+            >
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 w-full h-full bg-white z-40 pt-20">
-          <nav className="flex flex-col space-y-6 px-6 py-8">
-            <Link
-              href="/"
-              onClick={closeMobileMenu}
-              className={`text-lg font-instrument-sans transition-colors ${
-                pathname === "/" 
-                  ? "font-bold text-black" 
-                  : "text-gray-700 hover:text-black"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/docs"
-              onClick={closeMobileMenu}
-              className={`text-lg font-instrument-sans transition-colors ${
-                pathname === "/docs" 
-                  ? "font-bold text-black" 
-                  : "text-gray-700 hover:text-black"
-              }`}
-            >
-              Docs
-            </Link>
-            <Link
-              href="/marketplace"
-              onClick={closeMobileMenu}
-              className={`text-lg font-instrument-sans transition-colors ${
-                pathname === "/marketplace" 
-                  ? "font-bold text-black" 
-                  : "text-gray-700 hover:text-black"
-              }`}
-            >
-              Marketplace
-            </Link>
-            
-            <div className="pt-6 border-t border-gray-200">
-              {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    logoutMutation.mutate();
-                    closeMobileMenu();
-                  }}
-                  className="w-full border border-black text-black px-6 py-3 rounded-4xl transition-colors font-instrument-sans font-medium"
-                >
-                  Logout
-                </button>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={closeMobileMenu}
-                  className="block w-full text-center bg-black text-white px-6 py-3 rounded-4xl hover:bg-gray-800 transition-colors font-instrument-sans font-medium"
-                >
-                  Login
-                </Link>
-              )}
-            </div>
-          </nav>
+      <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {menuOpen
+            ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          }
+        </svg>
+      </button>
+
+      {menuOpen && (
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white border border-gray-200 px-6 py-5 flex flex-col gap-4 shadow-sm z-50">
+          <Link href="/" onClick={() => setMenuOpen(false)} className="text-sm font-dm-sans text-gray-700">Home</Link>
+          <Link href="/marketplace" onClick={() => setMenuOpen(false)} className="text-sm font-dm-sans text-gray-700">Trade</Link>
+          <Link href="/docs" onClick={() => setMenuOpen(false)} className="text-sm font-dm-sans text-gray-700">Docs</Link>
+
+          <div className="flex gap-3 pt-2 border-t border-gray-100">
+            <Link href="/login" onClick={() => setMenuOpen(false)} className="text-sm font-dm-sans border-2 border-black px-5 py-2 rounded-xl font-semibold">Login</Link>
+            <Link href="/register" onClick={() => setMenuOpen(false)} className="text-sm font-dm-sans bg-black text-white px-5 py-2 rounded-xl font-semibold">Sign up</Link>
+          </div>
         </div>
       )}
     </header>
