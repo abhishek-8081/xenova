@@ -4,6 +4,17 @@ services:
     ports:
       - "6379:6379"
 
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xenova_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - xenova_postgres_data:/var/lib/postgresql/data
+
   api-service:
     build:
       context: .
@@ -14,6 +25,7 @@ services:
       - ./apps/api-service/.env
     depends_on:
       - redis
+      - db
 
   engine-service:
     build:
@@ -25,6 +37,7 @@ services:
       - ./apps/engine-service/.env
     depends_on:
       - redis
+      - db
 
   price-poller-service:
     build:
@@ -36,3 +49,6 @@ services:
       - ./apps/price-poller-service/.env
     depends_on:
       - redis
+
+volumes:
+  xenova_postgres_data:

@@ -33,6 +33,9 @@ RUN npx tsc -b
 WORKDIR /app/apps/api-service
 RUN npx tsc -b
 
+COPY apps/api-service/start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 EXPOSE 3001
 
-CMD ["node", "dist/index.js"]
+CMD ["./start.sh"]

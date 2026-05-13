@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: xenova_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  api-service:
+    build:
+      context: .
+      dockerfile: apps/api-service/Dockerfile
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/xenova_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+      - redis
+
+  engine-service:
+    build:
+      context: .
+      dockerfile: apps/engine-service/Dockerfile
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/xenova_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - db
+      - redis
+
+  price-poller-service:
+    build:
+      context: .
+      dockerfile: apps/price-poller-service/Dockerfile
+    restart: always
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
