@@ -32,9 +32,11 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.get("origin")}`
-  );
+  res.on("finish", () => {
+    console.log(
+      `${new Date().toISOString()} - ${req.method} ${req.path} - Status: ${res.statusCode} - Origin: ${req.get("origin")}`
+    );
+  });
   next();
 });
 
