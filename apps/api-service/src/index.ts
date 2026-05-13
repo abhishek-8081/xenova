@@ -8,6 +8,8 @@ import tradeRouter from "./routes/trade.route";
 import authRouter from "./routes/auth.route";
 import balanceRouter from "./routes/balance.route";
 import candlesRouter from "./routes/candles.route";
+import { WebSocketServer, WebSocket } from "ws";
+import { redis } from "@repo/redis";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -70,7 +72,53 @@ app.use(
   }
 );
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`API Service running on port ${PORT}`);
   console.log(`Health check available at http://localhost:${PORT}/health`);
 });
+
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (ws) => {
+  console.log("New WebSocket connection");
+  ws.on("close", () => console.log("WebSocket connection closed"));
+});
+
+async function broadcastPrices() {
+  const client = redis.duplicate();
+  let lastId = "$";
+  
+  while (true) {
+    try {
+      const response = await client.xread("BLOCK", 0, "STREAMS", "engine-stream", lastId);
+      if (!response || !response.length) continue;
+
+      const [, messages] = response[0]!;
+      for (const [id, fields] of messages) {
+        lastId = id;
+        const dataField = fields.indexOf("data");
+        if (dataField === -1) continue;
+        
+        const raw = fields[dataField + 1];
+        if (!raw) continue;
+
+        const msg = JSON.parse(raw);
+        if (msg.kind === "price-update") {
+          const priceData = JSON.stringify(msg.payload);
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(priceData);
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Error in broadcast loop:", e);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+}
+
+broadcastPrices();
+
+export default app;
