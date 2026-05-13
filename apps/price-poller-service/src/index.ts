@@ -18,21 +18,23 @@ function connect() {
   });
 
   ws.on("message", async (message) => {
+    const rawMessage = message.toString();
+    console.log("RAW MESSAGE FROM EXCHANGE:", rawMessage);
     try {
-      const data = JSON.parse(message.toString());
-      if (data.b || data.a) {
-        // Only log every 10th message to keep logs clean
-        if (Math.random() > 0.9) console.log("Price Update Received:", data.s, data.b);
-        
+      const data = JSON.parse(rawMessage);
+      
+      // If it's a price update (bookTicker)
+      if (data.b || data.a || (data.data && (data.data.b || data.data.a))) {
+        const payload = data.data || data;
         await redis.xadd(
           "engine-stream",
           "*",
           "data",
-          JSON.stringify({ kind: "price-update", payload: data })
+          JSON.stringify({ kind: "price-update", payload })
         );
       }
     } catch (e) {
-      console.log("Error parsing price message:", e);
+      console.log("Error processing message:", e);
     }
   });
 
