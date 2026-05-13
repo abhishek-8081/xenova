@@ -11,7 +11,7 @@ import candlesRouter from "./routes/candles.route";
 import { WebSocketServer, WebSocket } from "ws";
 import { redis } from "@repo/redis";
 
-const app = express();
+const app: express.Application = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(
