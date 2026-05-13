@@ -15,7 +15,8 @@ Built as a full-stack TypeScript monorepo using Turborepo and pnpm workspaces.
 
 ### Trading View
 <!-- Add screenshot of the trading dashboard here -->
-![Trading View](./docs/screenshots/trading.png)
+<img width="1582" height="963" alt="Screenshot 2026-05-14 at 2 40 27 AM" src="https://github.com/user-attachments/assets/de20b08d-01f8-4ab5-8799-28288c049038" />
+
 
 ### Positions & History
 <!-- Add screenshot of the orders/positions panel here -->
@@ -23,7 +24,7 @@ Built as a full-stack TypeScript monorepo using Turborepo and pnpm workspaces.
 
 ### Auth
 <!-- Add screenshot of login/register pages here -->
-![Auth](./docs/screenshots/auth.png)
+<img width="1582" height="963" alt="Screenshot 2026-05-14 at 2 41 45 AM" src="https://github.com/user-attachments/assets/cf2e1838-85cc-43c7-a36e-35f64b49e7d6" />
 
 ---
 
