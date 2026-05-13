@@ -10,7 +10,8 @@ Built as a full-stack TypeScript monorepo using Turborepo and pnpm workspaces.
 
 ### Home
 <!-- Add screenshot of the landing page here -->
-![Home](./docs/screenshots/home.png)
+<img width="3164" height="1926" alt="image" src="https://github.com/user-attachments/assets/6656ae52-8d49-4625-b0f3-39880075a147" />
+
 
 ### Trading View
 <!-- Add screenshot of the trading dashboard here -->
