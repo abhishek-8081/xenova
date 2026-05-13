@@ -74,9 +74,10 @@ const LeftSideBar: React.FC = () => {
 
         messages.forEach((message) => {
             try {
-                const parsed: BackpackTradeData = JSON.parse(message);
-                if (parsed.data && parsed.data.s) {
-                    dataMap.set(parsed.data.s, parsed);
+                const parsed = JSON.parse(message);
+                const data = parsed.data || parsed;
+                if (data && data.s) {
+                    dataMap.set(data.s, { data, stream: '' } as any);
                 }
             } catch (error) {
                 console.error('Error parsing websocket message:', error);

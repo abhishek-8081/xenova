@@ -64,8 +64,9 @@ const RightSideBar: React.FC<RightSideBarProps> = ({ selectedSymbol }) => {
         for (const message of messages) {
             try {
                 const parsed = JSON.parse(message);
-                if (parsed.data && parsed.data.s && parsed.data.s.toLowerCase() === selectedSymbol.toLowerCase()) {
-                    latestTrade = parsed;
+                const data = parsed.data || parsed; // Handle both nested and flat formats
+                if (data && data.s && data.s.toLowerCase().replace('_', '') === selectedSymbol.toLowerCase().replace('_', '')) {
+                    latestTrade = { data };
                     break;
                 }
             } catch (error) {
