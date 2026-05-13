@@ -19,6 +19,9 @@ export const useAuth = () => {
     const loginMutation = useMutation({
         mutationFn: ({ email, password }: LoginRequest) => authService.login(email, password),
         onSuccess: (data) => {
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             queryClient.setQueryData(['user'], data.user);
             toast.success('Login successful!');
         },
@@ -31,6 +34,9 @@ export const useAuth = () => {
     const registerMutation = useMutation({
         mutationFn: ({ name, email, password }: RegisterRequest) => authService.register(name, email, password),
         onSuccess: (data) => {
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             queryClient.setQueryData(['user'], data.user);
             toast.success('Registration successful!');
             router.push('/');
@@ -44,6 +50,7 @@ export const useAuth = () => {
     const logoutMutation = useMutation({
         mutationFn: () => authService.logout(),
         onSuccess: () => {
+            localStorage.removeItem('token');
             queryClient.setQueryData(['user'], null);
             queryClient.invalidateQueries({ queryKey: ['user'] });
             toast.success('Logout successful');
