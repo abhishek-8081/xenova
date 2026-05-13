@@ -21,7 +21,12 @@ export async function authenticate(
   next: NextFunction
 ): Promise<void> {
   try {
-    const token = req.cookies?.token;
+    let token = req.cookies?.token;
+
+    if (!token && req.headers.authorization) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
     if (!token) {
       res
         .status(401)
