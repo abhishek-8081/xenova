@@ -24,7 +24,7 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/xenova_db
-      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3001
       FRONTEND_URL: ${FRONTEND_URL}
@@ -41,7 +41,7 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/xenova_db
-      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
     depends_on:
       - db
       - redis
@@ -52,7 +52,7 @@ services:
       dockerfile: apps/price-poller-service/Dockerfile
     restart: always
     environment:
-      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
     depends_on:
       - redis
 
