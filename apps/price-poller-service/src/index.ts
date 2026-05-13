@@ -18,10 +18,8 @@ function connect() {
   });
 
   ws.on("message", async (message) => {
-    const rawMessage = message.toString();
-    console.log("RAW MESSAGE FROM EXCHANGE:", rawMessage);
     try {
-      const data = JSON.parse(rawMessage);
+      const data = JSON.parse(message.toString());
       
       // If it's a price update (bookTicker)
       if (data.b || data.a || (data.data && (data.data.b || data.data.a))) {
