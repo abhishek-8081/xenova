@@ -31,8 +31,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, "secret", {
-      expiresIn: "1h",
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || "secret", {
+      expiresIn: "24h",
     });
 
     res.cookie("token", token, {
@@ -90,8 +90,8 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, "secret", {
-      expiresIn: "1h",
+    const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET || "secret", {
+      expiresIn: "24h",
     });
 
     res.cookie("token", token, {
